@@ -20,7 +20,7 @@
 ## Установка:
 
 1. Скопировать репозиторий:
-<code>git clone https://github.com/GriAndrey/YaBack1.git</code>
+<code>git clone https://github.com/GriAndrey/YaBackFiles</code>
 2. Создание образа из файла Dockerfile:
 <code>docker image build -t docker-backend .</code>
 3. Запуск Докера:
