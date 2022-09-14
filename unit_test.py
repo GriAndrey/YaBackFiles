@@ -1,5 +1,6 @@
 # encoding=utf8
 
+import time
 import json
 import re
 import subprocess
@@ -8,16 +9,16 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-API_BASEURL = "http://localhost:8080"
+API_BASEURL = "http://127.0.0.1:80"
 
-ROOT_ID = "069cb8d7-bbdd-47d3-ad8f-82ef4c269df1"
+ROOT_ID = "0"
 
 IMPORT_BATCHES = [
     {
         "items": [
             {
                 "type": "FOLDER",
-                "id": "069cb8d7-bbdd-47d3-ad8f-82ef4c269df1",
+                "id": "0",
                 "parentId": None
             }
         ],
@@ -28,7 +29,8 @@ IMPORT_BATCHES = [
             {
                 "type": "FOLDER",
                 "id": "d515e43f-f3f6-4471-bb77-6b455017a2d2",
-                "parentId": "069cb8d7-bbdd-47d3-ad8f-82ef4c269df1",
+                "parentId": "0",
+
             },
             {
                 "type": "FILE",
@@ -52,7 +54,7 @@ IMPORT_BATCHES = [
             {
                 "type": "FOLDER",
                 "id": "1cc0129a-2bfe-474c-9ee6-d435bf5fc8f2",
-                "parentId": "069cb8d7-bbdd-47d3-ad8f-82ef4c269df1",
+                "parentId": "0",
             },
             {
                 "type": "FILE",
@@ -75,7 +77,7 @@ IMPORT_BATCHES = [
         "items": [
             {
                 "type": "FILE",
-                "url": "/file/url5",
+                "url": "/file/url5/",
                 "id": "73bc3b36-02d1-4245-ab35-3106c9ee1c65",
                 "parentId": "1cc0129a-2bfe-474c-9ee6-d435bf5fc8f2",
                 "size": 64
@@ -87,7 +89,7 @@ IMPORT_BATCHES = [
 
 EXPECTED_TREE = {
     "type": "FOLDER",
-    "id": "069cb8d7-bbdd-47d3-ad8f-82ef4c269df1",
+    "id": "0",
     "size": 1984,
     "url": None,
     "parentId": None,
@@ -96,7 +98,7 @@ EXPECTED_TREE = {
         {
             "type": "FOLDER",
             "id": "1cc0129a-2bfe-474c-9ee6-d435bf5fc8f2",
-            "parentId": "069cb8d7-bbdd-47d3-ad8f-82ef4c269df1",
+            "parentId": "0",
             "size": 1600,
             "url": None,
             "date": "2022-02-03T15:00:00Z",
@@ -121,7 +123,7 @@ EXPECTED_TREE = {
                 },
                 {
                     "type": "FILE",
-                    "url": "/file/url5",
+                    "url": "/file/url5/",
                     "id": "73bc3b36-02d1-4245-ab35-3106c9ee1c65",
                     "parentId": "1cc0129a-2bfe-474c-9ee6-d435bf5fc8f2",
                     "size": 64,
@@ -133,7 +135,7 @@ EXPECTED_TREE = {
         {
             "type": "FOLDER",
             "id": "d515e43f-f3f6-4471-bb77-6b455017a2d2",
-            "parentId": "069cb8d7-bbdd-47d3-ad8f-82ef4c269df1",
+            "parentId": "0",
             "size": 384,
             "url": None,
             "date": "2022-02-02T12:00:00Z",
@@ -226,6 +228,7 @@ def test_nodes():
 
     deep_sort_children(response)
     deep_sort_children(EXPECTED_TREE)
+
     if response != EXPECTED_TREE:
         print_diff(EXPECTED_TREE, response)
         print("Response tree doesn't match expected tree.")
@@ -268,11 +271,34 @@ def test_delete():
 
 
 def test_all():
-    test_import()
-    test_nodes()
-    test_updates()
-    test_history()
     test_delete()
+    t1 = time.perf_counter()
+    for i in range(125):
+        test_import()
+        test_delete()
+    t2 = time.perf_counter()
+
+    test_import()
+
+    t3 = time.perf_counter()
+    for i in range(100):
+        test_nodes()
+    t4 = time.perf_counter()
+
+    t5 = time.perf_counter()
+    for i in range(100):
+        test_updates()
+    t6 = time.perf_counter()
+
+    t7 = time.perf_counter()
+    for i in range(100):
+        test_history()
+    t8 = time.perf_counter()
+
+    print(f'1000 elements import and 1000 elements delete test took:{t2 - t1} seconds')
+    print(f'100 nodes test took:{t4 - t3} seconds')
+    print(f'100 updates test took:{t6 - t5} seconds')
+    print(f'100 history test took:{t8 - t7} seconds')
 
 
 def main():
