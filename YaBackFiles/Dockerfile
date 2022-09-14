@@ -1,6 +1,6 @@
 FROM  python:3.9-alpine
 MAINTAINER Andrey Gribunin 'andrey@gribunin.ru'
-WORKDIR /app
-ADD . /app
+WORKDIR /main
+ADD . /main
 RUN pip install -r requirements.txt
-CMD ["python", "app.py"]
+CMD ["python", "main.py"]
